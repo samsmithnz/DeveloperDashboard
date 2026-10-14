@@ -1,6 +1,6 @@
 # Developer Dashboard
 
-The goal of the Developer Dashboard is to create a team improvement tool- not a developer leaderboard. Its central question is: Are teams delivering valuable, reliable software more effectively, and is AI helping, without increasing risk or maintenance cost?
+The goal of the Developer Dashboard is to create a team improvement tool the incorporates best practices for software development with AI - not a developer leaderboard. Its central question is: Are teams delivering valuable, reliable software more effectively, and is AI helping, without increasing risk or maintenance cost?
 
 These are related, but should not become one opaque score.
 | Dimension |	Question |	Useful signals |

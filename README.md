@@ -84,7 +84,7 @@ A possible maturity progression:
 3. Repeatable: Automated releases, dependency management, reproducible environments.
 4. Measured: Delivery metrics, reliability objectives, trend monitoring.
 5. Continuously improving: Evidence-backed experiments and tracked remediation.
-6. 
+
 Apply different requirements to production services, libraries, and experiments. Allow documented exceptions with owners and expiration dates.
 
 Avoid a single “87/100 engineering score” that lets good documentation cancel out a critical security gap.

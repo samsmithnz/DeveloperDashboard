@@ -1,5 +1,23 @@
 # Developer Dashboard
 
+## Interactive UI prototype
+
+The `src/DeveloperDashboard.Web` project is a .NET 10 ASP.NET Core MVC design
+prototype with fictional, in-memory sample data. It is not the production MVP:
+there is no authentication, GitHub connection, synchronization, or persistence.
+Run it locally only; do not expose it as an authenticated dashboard.
+
+```sh
+dotnet run --project src/DeveloperDashboard.Web --urls http://localhost:5080
+```
+
+Open `http://localhost:5080`. Explore the portfolio search/team filters,
+repository details, and severity-filtered recommendations. The Sync now button
+explicitly explains the prototype limitation; it never claims to sync.
+The visual direction uses a restrained green palette, a sidebar workspace,
+separate governance/security/flow indicators, and prominent evidence/freshness
+states. Bootstrap is served locally; no external UI services are required.
+
 The goal of the Developer Dashboard is to create a team improvement tool the incorporates best practices for software development with AI - not a developer leaderboard. Its central question is: Are teams delivering valuable, reliable software more effectively, and is AI helping, without increasing risk or maintenance cost?
 
 These are related, but should not become one opaque score.

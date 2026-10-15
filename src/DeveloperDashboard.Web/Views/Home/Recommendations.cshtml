@@ -1,0 +1,12 @@
+@model Recommendation[]
+@{ ViewData["Title"] = "Recommendations"; }
+<div class="page-heading"><div><div class="eyebrow">FROM EVIDENCE TO IMPROVEMENT</div><h1>Recommendations</h1><p>A focused queue of the next useful changes. No automatic writes.</p></div><span class="state neutral">Read-only</span></div>
+<div class="notice">Exceptions live in the central configuration repository, with an owner, rationale and expiry. The dashboard does not create exceptions or issues.</div>
+<section class="panel">
+<form class="filters" method="get"><div><label for="severity">Severity</label><select id="severity" name="severity" class="form-select"><option value="">All severities</option><option selected="@(ViewData["Severity"]?.ToString() == "High")">High</option><option selected="@(ViewData["Severity"]?.ToString() == "Medium")">Medium</option></select></div><button class="btn btn-outline-dark" type="submit">Apply filter</button><a class="reset" asp-action="Recommendations">Reset</a><span class="subtle ms-auto">@Model.Length findings</span></form>
+@foreach (var item in Model)
+{
+    <article class="finding"><div class="finding-top"><span class="state @PrototypeData.Tone(item.Severity)">@item.Severity</span><span class="rule">@item.Rule · v1</span><span class="subtle ms-auto">Owner: @item.Owner</span></div><h2>@item.Title</h2><p><a asp-action="Repository" asp-route-id="@item.Repository">@item.Repository</a> · @item.Explanation</p><details><summary>How to resolve</summary><p>@item.Fix</p><p class="subtle">Sample evidence only. Live findings will link to GitHub and clear after a successful verification sync.</p></details></article>
+}
+@if (Model.Length == 0) { <div class="empty">No recommendations match the selected severity.</div> }
+</section>

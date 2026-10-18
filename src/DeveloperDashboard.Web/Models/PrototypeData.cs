@@ -11,24 +11,56 @@ public record ProjectCard(string Slug, string Name, string Description, string T
         PrototypeData.Repositories.Where(r => RepositorySlugs.Contains(r.Slug)).ToArray();
     public IReadOnlyList<Recommendation> Recommendations =>
         PrototypeData.Recommendations.Where(r => RepositorySlugs.Contains(r.Repository)).ToArray();
-    public string Governance => Rollup(Repositories.Select(r => r.Governance));
-    public string Security => Rollup(Repositories.Select(r => r.Security));
-    public string Flow => Rollup(Repositories.Select(r => r.Flow));
+    public IReadOnlyList<DurationMetric> Metrics => PrototypeData.ProjectMetrics[Slug];
     public string Freshness => Repositories.All(r => r.Freshness == "Current") ? "Current" : "Stale";
     public int UnknownRepositories => Repositories.Count(r =>
         r.Governance == "Unknown" || r.Security == "Unknown" || r.Flow is "Unknown" or "Insufficient data");
-
-    private static string Rollup(IEnumerable<string> states)
-    {
-        var values = states.ToArray();
-        return new[] { "Unhealthy", "Needs attention", "Attention", "Not configured", "Unknown", "Insufficient data" }
-            .FirstOrDefault(values.Contains) ?? "Healthy";
-    }
 }
 public record DashboardViewModel(IReadOnlyList<ProjectCard> Projects, string? Search, string? Team);
 
 public static class PrototypeData
 {
+    public static IReadOnlyDictionary<string, IReadOnlyList<DurationMetric>> ProjectMetrics { get; } =
+        new Dictionary<string, IReadOnlyList<DurationMetric>>
+        {
+            ["checkout"] =
+            [
+                new("Change lead time", "Median elapsed time from commit to its linked successful production deployment.",
+                    TimeScale.Hours, [new("20 Jul - 18 Aug", 72, 28), new("19 Aug - 17 Sep", 48, 32), new("18 Sep - 17 Oct", 5, 36)],
+                    "Fictional linked commits and production deployments"),
+                new("First review wait", "Median elapsed time from a PR becoming ready to its first human review; drafts and bot reviews excluded.",
+                    TimeScale.Hours, [new("20 Jul - 18 Aug", 5, 40), new("19 Aug - 17 Sep", 4.5, 44), new("18 Sep - 17 Oct", 4, 48)],
+                    "Fictional project PRs, deduplicated across supporting repositories"),
+                new("Failed deployment recovery", "Median elapsed time from a failed production deployment to verified recovery; unrelated incidents excluded.",
+                    TimeScale.Hours, [new("20 Jul - 18 Aug", 3, 4), new("19 Aug - 17 Sep", 28, 3), new("18 Sep - 17 Oct", 48, 4)],
+                    "Fictional failed production deployments linked to recovery evidence")
+            ],
+            ["identity"] =
+            [
+                new("Change lead time", "Median elapsed time from commit to its linked successful production deployment.",
+                    TimeScale.Hours, [new("20 Jul - 18 Aug", 240, 12), new("19 Aug - 17 Sep", 72, 14), new("18 Sep - 17 Oct", 48, 10)],
+                    "Fictional linked commits and production deployments", "Collection is stale; bands are last-known values, not a current assessment.", IsStale: true),
+                new("First review wait", "Median elapsed time from a PR becoming ready to its first human review; drafts and bot reviews excluded.",
+                    TimeScale.Hours, [new("20 Jul - 18 Aug", null, 0), new("19 Aug - 17 Sep", null, 0), new("18 Sep - 17 Oct", null, 0)],
+                    "Fictional project PRs", "Review evidence is unavailable. No duration or trend can be inferred."),
+                new("Failed deployment recovery", "Median elapsed time from a failed production deployment to verified recovery; unrelated incidents excluded.",
+                    TimeScale.Hours, [new("20 Jul - 18 Aug", null, 0), new("19 Aug - 17 Sep", null, 0), new("18 Sep - 17 Oct", null, 0)],
+                    "Fictional deployment and incident records", "Incident evidence is not connected. Missing records do not mean instant recovery.")
+            ],
+            ["developer-platform"] =
+            [
+                new("Change lead time", "Median elapsed time from commit to its linked successful production deployment.",
+                    TimeScale.Hours, [new("20 Jul - 18 Aug", null, 0), new("19 Aug - 17 Sep", null, 0), new("18 Sep - 17 Oct", null, 0)],
+                    "Fictional project configuration", "This maintenance library has no production deployment target; package releases are not used as a deployment proxy.", IsApplicable: false),
+                new("First review wait", "Median elapsed time from a PR becoming ready to its first human review; drafts and bot reviews excluded.",
+                    TimeScale.Hours, [new("20 Jul - 18 Aug", null, 0), new("19 Aug - 17 Sep", null, 0), new("18 Sep - 17 Oct", 6, 8)],
+                    "Fictional project PRs", "Only the current window has review evidence; history is insufficient for a trend."),
+                new("Failed deployment recovery", "Median elapsed time from a failed production deployment to verified recovery; unrelated incidents excluded.",
+                    TimeScale.Hours, [new("20 Jul - 18 Aug", null, 0), new("19 Aug - 17 Sep", null, 0), new("18 Sep - 17 Oct", null, 0)],
+                    "Fictional project configuration", "No production deployment target.", IsApplicable: false)
+            ]
+        };
+
     public static IReadOnlyList<ProjectCard> Projects { get; } =
     [
         new("checkout", "Customer checkout", "Help customers complete a secure, reliable purchase.",

@@ -11,26 +11,45 @@ Run it locally only; do not expose it as an authenticated dashboard.
 dotnet run --project src/DeveloperDashboard.Web --urls http://localhost:5080
 ```
 
-Open `http://localhost:5080`. The project dashboard leads with project counts,
-health indicators, evidence coverage, and a prioritized improvement queue.
+Open `http://localhost:5080`. Project inventory comes first, followed by portfolio
+context and the prioritized improvement queue. Each project shows metric values
+as time bands, with a separate health indicator and a three-window history.
 Search projects by name or purpose and filter by accountable team; these filters
 apply to the inventory, while the dashboard snapshot covers all projects.
 Open a project for its improvement plan and supporting repositories, then drill
 into repository evidence or severity-filtered recommendations. The Sync now button
 explicitly explains the prototype limitation; it never claims to sync.
 The visual direction uses a restrained green palette, a sidebar workspace,
-separate governance/security/flow indicators, and prominent evidence/freshness
+metric-led project cards, separate governance/security evidence, and prominent freshness
 states. Bootstrap is served locally; no external UI services are required.
 
 The fictional project inventory models Customer checkout, Identity & access,
 and Developer platform. Projects can span repositories, and the shared
 `platform-sdk` supports multiple projects. Project accountability is separate
 from repository ownership. Repository and finding totals are deduplicated;
-project impacts include shared dependencies. Per-dimension indicators surface
-known gaps first, then unknown or insufficient evidence, and show healthy only
-when all supporting repositories are healthy. A project is current only when
+project impacts include shared dependencies. A project is current only when
 every supporting repository is current. Missing evidence is always called out
-separately; there is no combined health score or invented delivery trend.
+separately; there is no combined health score.
+
+Delivery and flow metrics use **explicit fictional project observations**, not
+live measurements or averages of repository medians. Three non-overlapping
+30-day windows cover 20 July through 17 October 2026. Expand a metric to see its
+definition, calculation version, source, sample sizes, collection time,
+illustrative target, and limitations. The examples show improvement (days to
+hours), decline (hours to days), and no meaningful band change (5 hours to 4
+hours). Missing data, incomplete history, stale observations, and metrics that
+do not apply to maintenance libraries are shown separately.
+
+Time bands are minutes (<1 hour), hours (<24 hours), days (<7 days), weeks
+(<30 days), and months (30 days or more). For these duration metrics, smaller is
+faster. Health compares the current band with an **illustrative hours-or-faster
+target**, not an industry benchmark. Trend compares the first and latest
+windows only when every window has observations and the current evidence is
+fresh. Movement within a band is labeled **Same band**, never improving or
+declining; no percentage deltas or fine-grained sparklines imply false precision.
+Lead time uses commits linked to production deployments, first-review wait is
+distinct from delivery lead time, and recovery uses failed deployments linked
+to recovery evidence. Missing incident records never produce a zero duration.
 
 The goal of the Developer Dashboard is to create a team improvement tool the incorporates best practices for software development with AI - not a developer leaderboard. Its central question is: Are teams delivering valuable, reliable software more effectively, and is AI helping, without increasing risk or maintenance cost?
 

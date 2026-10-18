@@ -10,40 +10,14 @@
     <div class="sync"><span>Sample snapshot · 12 minutes ago</span><button type="button" class="btn btn-dark" id="sync-demo">Sync now <span aria-hidden="true">&#8635;</span></button></div>
 </div>
 <div id="sync-feedback" class="notice" role="status" hidden></div>
-<section class="summary-grid" aria-label="All-project snapshot">
-    <article class="summary"><span>Projects in view</span><strong>@projects.Count <small>projects</small></strong><p>@projects.Select(p => p.Team).Distinct().Count() accountable teams · @PrototypeData.Repositories.Count unique repositories</p></article>
-    <article class="summary"><span>Projects needing action</span><strong>@projects.Count(p => p.Recommendations.Count > 0) <small>with open findings</small></strong><p>Focus on critical projects first</p></article>
-    <article class="summary"><span>Improvement queue</span><strong>@priorities.Count <small>open actions</small></strong><p>@priorities.Count(r => r.Severity == "High") high priority · findings counted once</p></article>
-    <article class="summary"><span>Evidence coverage</span><strong>@current<small> of @projects.Count current</small></strong><p>@projects.Count(p => p.Freshness != "Current") project has stale repository evidence</p></article>
-</section>
-<div class="dashboard-grid">
-    <section class="panel health-panel">
-        <div class="panel-heading"><div><h2>Project health snapshot</h2><p>All projects · independent indicators, never a blended score</p></div></div>
-        @foreach (var dimension in new[] { ("Governance", projects.Select(p => p.Governance)), ("Security", projects.Select(p => p.Security)), ("Engineering flow", projects.Select(p => p.Flow)) })
-        {
-            <div class="health-row"><h3>@dimension.Item1</h3><div class="health-counts">
-            @foreach (var group in dimension.Item2.GroupBy(s => s))
-            { <span class="state @PrototypeData.Tone(group.Key)">@group.Count() @group.Key</span> }
-            </div></div>
-        }
-        <div class="panel-foot">Known gaps surface first. Unknown evidence remains visible on each project.</div>
-    </section>
-    <section class="panel">
-        <div class="panel-heading"><div><h2>Focus next</h2><p>Highest-priority actions across your projects</p></div><a class="subtle" asp-action="Recommendations">View queue &rarr;</a></div>
-        @foreach (var item in priorities)
-        {
-            var affectedProjects = projects.Where(p => p.RepositorySlugs.Contains(item.Repository)).ToArray();
-            <article class="priority-item"><span class="state @PrototypeData.Tone(item.Severity)">@item.Severity</span><div><h3><a asp-action="Repository" asp-route-id="@item.Repository">@item.Title</a></h3><p>@item.Owner · @item.Repository</p><div class="project-links">@foreach (var project in affectedProjects) { <a asp-action="Project" asp-route-id="@project.Slug">@project.Name &rarr;</a> }</div></div></article>
-        }
-    </section>
-</div>
 <section class="project-inventory" aria-labelledby="project-inventory-heading">
-    <div class="panel-heading"><div><h2 id="project-inventory-heading">Project inventory</h2><p>Products, services, and shared platforms. Repositories are the supporting evidence.</p></div><span class="subtle">@Model.Projects.Count of @projects.Count projects</span></div>
+    <div class="panel-heading"><div><h2 id="project-inventory-heading">Project inventory</h2><p>Metric first. Health beside it. Meaningful movement over time.</p></div><span class="subtle">@Model.Projects.Count of @projects.Count projects</span></div>
     <form class="filters" method="get">
         <div><label for="search">Search projects</label><input id="search" name="search" value="@Model.Search" class="form-control" placeholder="Search by project name or purpose" /></div>
         <div><label for="team">Accountable team</label><select id="team" name="team" class="form-select"><option value="">All teams</option>@foreach (var team in projects.Select(p => p.Team).Distinct()) { <option selected="@(Model.Team == team)" value="@team">@team</option> }</select></div>
         <button class="btn btn-outline-dark" type="submit">Apply filters</button><a asp-action="Index" class="reset">Reset</a>
     </form>
+    <div class="metric-guide"><strong>Fictional 90-day history · 20 Jul - 17 Oct 2026</strong><p>Three 30-day windows, oldest to newest. Days &rarr; hours is improving; 5 hours &rarr; 4 hours stays in the same band. Health is relative to an illustrative target, not a project score.</p></div>
     <div class="project-grid">
     @foreach (var project in Model.Projects)
     {
@@ -51,12 +25,8 @@
             <div class="project-card-heading"><span class="eyebrow">@project.Team · @project.Lifecycle</span><span class="state @PrototypeData.Tone(project.Freshness)">@project.Freshness</span></div>
             <h3><a asp-action="Project" asp-route-id="@project.Slug">@project.Name <span aria-hidden="true">&rarr;</span></a></h3><p class="project-purpose">@project.Description</p>
             <div class="project-meta">@project.Criticality criticality · @project.Repositories.Count repositories</div>
-            <dl class="project-signals">
-                <div><dt>Governance</dt><dd><span class="state @PrototypeData.Tone(project.Governance)">@project.Governance</span></dd></div>
-                <div><dt>Security</dt><dd><span class="state @PrototypeData.Tone(project.Security)">@project.Security</span></dd></div>
-                <div><dt>Flow</dt><dd><span class="state @PrototypeData.Tone(project.Flow)">@project.Flow</span></dd></div>
-            </dl>
-            <p class="evidence-note">@project.UnknownRepositories of @project.Repositories.Count repositories have unknown or insufficient evidence.</p>
+            <partial name="_ProjectMetrics" model="project.Metrics" />
+            <p class="evidence-note">@project.UnknownRepositories of @project.Repositories.Count repositories have unknown or insufficient evidence. See project details for governance and security findings.</p>
             <div class="project-next"><span class="eyebrow">NEXT ACTION</span>
             @if (project.Recommendations.FirstOrDefault() is { } next)
             { <a asp-action="Project" asp-route-id="@project.Slug">@next.Title &rarr;</a> }
@@ -68,4 +38,21 @@
     </div>
     @if (Model.Projects.Count == 0) { <div class="panel empty">No projects match these filters. Try another search or reset the filters.</div> }
     <p class="inventory-note">Filters apply to project inventory. The snapshot and focus queue cover all projects. Shared repositories can support multiple projects; repository and finding totals are deduplicated.</p>
+</section>
+<section class="portfolio-context" aria-labelledby="portfolio-context-heading">
+    <div class="panel-heading"><div><h2 id="portfolio-context-heading">Portfolio context</h2><p>All projects · supporting context after the inventory</p></div></div>
+    <div class="summary-grid" aria-label="All-project snapshot">
+        <article class="summary"><span>Projects in view</span><strong>@projects.Count <small>projects</small></strong><p>@projects.Select(p => p.Team).Distinct().Count() accountable teams · @PrototypeData.Repositories.Count unique repositories</p></article>
+        <article class="summary"><span>Projects needing action</span><strong>@projects.Count(p => p.Recommendations.Count > 0) <small>with open findings</small></strong><p>Focus on critical projects first</p></article>
+        <article class="summary"><span>Improvement queue</span><strong>@priorities.Count <small>open actions</small></strong><p>@priorities.Count(r => r.Severity == "High") high priority · findings counted once</p></article>
+        <article class="summary"><span>Evidence coverage</span><strong>@current<small> of @projects.Count current</small></strong><p>@projects.Count(p => p.Freshness != "Current") project has stale repository evidence</p></article>
+    </div>
+</section>
+<section class="panel">
+    <div class="panel-heading"><div><h2>Focus next</h2><p>Highest-priority actions across your projects</p></div><a class="subtle" asp-action="Recommendations">View queue &rarr;</a></div>
+    @foreach (var item in priorities)
+    {
+        var affectedProjects = projects.Where(p => p.RepositorySlugs.Contains(item.Repository)).ToArray();
+        <article class="priority-item"><span class="state @PrototypeData.Tone(item.Severity)">@item.Severity</span><div><h3><a asp-action="Repository" asp-route-id="@item.Repository">@item.Title</a></h3><p>@item.Owner · @item.Repository</p><div class="project-links">@foreach (var project in affectedProjects) { <a asp-action="Project" asp-route-id="@project.Slug">@project.Name &rarr;</a> }</div></div></article>
+    }
 </section>

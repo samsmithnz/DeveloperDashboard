@@ -8,11 +8,17 @@ public class HomeController : Controller
 {
     public IActionResult Index(string? search, string? team)
     {
-        var repositories = PrototypeData.Repositories.Where(r =>
+        var projects = PrototypeData.Projects.Where(r =>
             (string.IsNullOrWhiteSpace(search) || r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
                 || r.Description.Contains(search, StringComparison.OrdinalIgnoreCase)) &&
             (string.IsNullOrWhiteSpace(team) || r.Team == team)).ToArray();
-        return View(new PortfolioViewModel(repositories, search, team));
+        return View(new DashboardViewModel(projects, search, team));
+    }
+
+    public IActionResult Project(string id)
+    {
+        var project = PrototypeData.Projects.SingleOrDefault(p => p.Slug == id);
+        return project is null ? NotFound() : View(project);
     }
 
     public IActionResult Repository(string id)

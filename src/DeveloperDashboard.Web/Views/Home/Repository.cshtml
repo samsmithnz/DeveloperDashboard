@@ -1,6 +1,10 @@
 @model RepositoryCard
 @{ ViewData["Title"] = Model.Name; }
-<a class="back-link" asp-action="Index">&larr; Portfolio</a>
+<a class="back-link" asp-action="Index">&larr; Project dashboard</a>
+<div class="repository-projects"><span class="subtle">Supporting repository for</span>
+@foreach (var project in PrototypeData.Projects.Where(p => p.RepositorySlugs.Contains(Model.Slug)))
+{ <a asp-action="Project" asp-route-id="@project.Slug">@project.Name &rarr;</a> }
+</div>
 <div class="page-heading"><div><div class="eyebrow">@Model.Team.ToUpperInvariant() / REPOSITORY DETAIL</div><h1>@Model.Name</h1><p>@Model.Description · @Model.Criticality criticality</p></div><span class="state @PrototypeData.Tone(Model.Freshness)">@Model.Freshness sample snapshot</span></div>
 <div class="summary-grid detail-summary">
     @foreach (var item in new[] { ("Governance", Model.Governance), ("Security", Model.Security), ("Flow", Model.Flow) })

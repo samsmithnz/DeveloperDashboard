@@ -4,10 +4,41 @@ public record RepositoryCard(string Slug, string Name, string Description, strin
     string Criticality, string Governance, string Security, string Flow, string Freshness);
 public record Recommendation(string Repository, string Rule, string Title, string Severity,
     string Owner, string Explanation, string Fix);
-public record PortfolioViewModel(IReadOnlyList<RepositoryCard> Repositories, string? Search, string? Team);
+public record ProjectCard(string Slug, string Name, string Description, string Team,
+    string Criticality, string Lifecycle, IReadOnlyList<string> RepositorySlugs)
+{
+    public IReadOnlyList<RepositoryCard> Repositories =>
+        PrototypeData.Repositories.Where(r => RepositorySlugs.Contains(r.Slug)).ToArray();
+    public IReadOnlyList<Recommendation> Recommendations =>
+        PrototypeData.Recommendations.Where(r => RepositorySlugs.Contains(r.Repository)).ToArray();
+    public string Governance => Rollup(Repositories.Select(r => r.Governance));
+    public string Security => Rollup(Repositories.Select(r => r.Security));
+    public string Flow => Rollup(Repositories.Select(r => r.Flow));
+    public string Freshness => Repositories.All(r => r.Freshness == "Current") ? "Current" : "Stale";
+    public int UnknownRepositories => Repositories.Count(r =>
+        r.Governance == "Unknown" || r.Security == "Unknown" || r.Flow is "Unknown" or "Insufficient data");
+
+    private static string Rollup(IEnumerable<string> states)
+    {
+        var values = states.ToArray();
+        return new[] { "Unhealthy", "Needs attention", "Attention", "Not configured", "Unknown", "Insufficient data" }
+            .FirstOrDefault(values.Contains) ?? "Healthy";
+    }
+}
+public record DashboardViewModel(IReadOnlyList<ProjectCard> Projects, string? Search, string? Team);
 
 public static class PrototypeData
 {
+    public static IReadOnlyList<ProjectCard> Projects { get; } =
+    [
+        new("checkout", "Customer checkout", "Help customers complete a secure, reliable purchase.",
+            "Commerce", "Critical", "Production", ["payments-api", "customer-web", "platform-sdk"]),
+        new("identity", "Identity & access", "Give every product a trusted sign-in and access foundation.",
+            "Platform", "Critical", "Production", ["identity-service", "platform-sdk"]),
+        new("developer-platform", "Developer platform", "Make it easier for teams to build and integrate products.",
+            "Platform", "High", "Maintenance", ["platform-sdk"])
+    ];
+
     public static IReadOnlyList<RepositoryCard> Repositories { get; } =
     [
         new("payments-api", "payments-api", "Payment processing and checkout", "Commerce", "Critical", "Needs attention", "Unhealthy", "Attention", "Current"),

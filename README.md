@@ -11,12 +11,26 @@ Run it locally only; do not expose it as an authenticated dashboard.
 dotnet run --project src/DeveloperDashboard.Web --urls http://localhost:5080
 ```
 
-Open `http://localhost:5080`. Explore the portfolio search/team filters,
-repository details, and severity-filtered recommendations. The Sync now button
+Open `http://localhost:5080`. The project dashboard leads with project counts,
+health indicators, evidence coverage, and a prioritized improvement queue.
+Search projects by name or purpose and filter by accountable team; these filters
+apply to the inventory, while the dashboard snapshot covers all projects.
+Open a project for its improvement plan and supporting repositories, then drill
+into repository evidence or severity-filtered recommendations. The Sync now button
 explicitly explains the prototype limitation; it never claims to sync.
 The visual direction uses a restrained green palette, a sidebar workspace,
 separate governance/security/flow indicators, and prominent evidence/freshness
 states. Bootstrap is served locally; no external UI services are required.
+
+The fictional project inventory models Customer checkout, Identity & access,
+and Developer platform. Projects can span repositories, and the shared
+`platform-sdk` supports multiple projects. Project accountability is separate
+from repository ownership. Repository and finding totals are deduplicated;
+project impacts include shared dependencies. Per-dimension indicators surface
+known gaps first, then unknown or insufficient evidence, and show healthy only
+when all supporting repositories are healthy. A project is current only when
+every supporting repository is current. Missing evidence is always called out
+separately; there is no combined health score or invented delivery trend.
 
 The goal of the Developer Dashboard is to create a team improvement tool the incorporates best practices for software development with AI - not a developer leaderboard. Its central question is: Are teams delivering valuable, reliable software more effectively, and is AI helping, without increasing risk or maintenance cost?
 
@@ -111,7 +125,7 @@ Avoid a single “87/100 engineering score” that lets good documentation cance
 
 ### Portfolio overview
 
-A searchable repository/service inventory with:
+A project-first dashboard with a searchable product/service/platform inventory:
 -	Owner and criticality.
 - Health indicators and trends.
 -	Maturity gaps.

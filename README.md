@@ -51,6 +51,8 @@ Lead time uses commits linked to production deployments, first-review wait is
 distinct from delivery lead time, and recovery uses failed deployments linked
 to recovery evidence. Missing incident records never produce a zero duration.
 
+See [MVP architecture and GitHub App decisions](docs/mvp-architecture-decisions.md) for the hosting, access, permission, storage, configuration, and synchronization contract.
+
 The goal of the Developer Dashboard is to create a team improvement tool the incorporates best practices for software development with AI - not a developer leaderboard. Its central question is: Are teams delivering valuable, reliable software more effectively, and is AI helping, without increasing risk or maintenance cost?
 
 These are related, but should not become one opaque score.

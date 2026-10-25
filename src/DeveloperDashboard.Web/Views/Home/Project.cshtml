@@ -1,0 +1,31 @@
+@model ProjectCard
+@{ ViewData["Title"] = Model.Name; }
+<a class="back-link" asp-action="Index">&larr; Project dashboard</a>
+<div class="page-heading"><div><div class="eyebrow">@Model.Team.ToUpperInvariant() / PROJECT OVERVIEW</div><h1>@Model.Name</h1><p>@Model.Description</p><div class="project-meta">@Model.Criticality criticality · @Model.Lifecycle · Accountable team: @Model.Team</div></div><span class="state @PrototypeData.Tone(Model.Freshness)">@Model.Freshness sample snapshot</span></div>
+<section class="panel project-metric-detail" aria-labelledby="project-metrics-heading">
+    <div class="panel-heading"><div><h2 id="project-metrics-heading">Delivery &amp; flow metrics</h2><p>Fictional 90-day history · three 30-day windows · 20 Jul - 17 Oct 2026</p></div></div>
+    <partial name="_ProjectMetrics" model="Model.Metrics" />
+    <div class="panel-foot">Smaller time bands are faster. Health compares the current band with its illustrative target; trend compares the first and latest windows. A change from 5 hours to 4 hours remains in the same band.</div>
+</section>
+<div class="notice">@Model.UnknownRepositories of @Model.Repositories.Count supporting repositories have unknown or insufficient evidence. Delivery speed does not cancel out governance or security gaps; review these separately below.</div>
+@if (Model.Freshness == "Stale") { <div class="notice">Some repository evidence is stale. These are last-known results, not a fresh project assessment.</div> }
+<div class="detail-grid">
+    <section class="panel"><div class="panel-heading"><div><h2>Project improvement plan</h2><p>Actions from every supporting repository</p></div><span class="subtle">@Model.Recommendations.Count findings</span></div>
+    @foreach (var finding in Model.Recommendations)
+    {
+        <article class="finding"><span class="state @PrototypeData.Tone(finding.Severity)">@finding.Severity</span><span class="rule">@finding.Rule · v1</span><h3>@finding.Title</h3><p><a asp-action="Repository" asp-route-id="@finding.Repository">@finding.Repository</a> · Action owner: @finding.Owner</p><p>@finding.Explanation</p><details><summary>Suggested fix &amp; evidence</summary><p>@finding.Fix</p><p class="subtle">Fictional evidence from the sample snapshot. No live GitHub alert is linked.</p></details></article>
+    }
+    @if (Model.Recommendations.Count == 0)
+    { <div class="finding"><h3>Fill the evidence gaps</h3><p>No actionable findings in this sample. Review unknown security and flow evidence before drawing a conclusion about project health.</p></div> }
+    </section>
+    <section class="panel"><div class="panel-heading"><div><h2>Project context</h2><p>Purpose, ownership, and boundaries</p></div></div><dl class="context"><dt>Accountable team</dt><dd>@Model.Team</dd><dt>Lifecycle</dt><dd>@Model.Lifecycle</dd><dt>Business criticality</dt><dd>@Model.Criticality</dd><dt>Repository relationships</dt><dd>A project may span repositories. Shared libraries may support more than one project; repository ownership can differ from project accountability.</dd><dt>Delivery &amp; outcomes</dt><dd>Delivery bands above use explicit fictional project observations, not averages of repository metrics. Product outcomes are not loaded and are never inferred from repository activity.</dd></dl></section>
+</div>
+<section class="panel mt-4"><div class="panel-heading"><div><h2>Supporting repositories</h2><p>Drill into evidence without losing the project context</p></div></div>
+<div class="table-responsive"><table class="table inventory"><caption class="visually-hidden">Supporting repository ownership and independent health indicators</caption><thead><tr><th>Repository / owner</th><th>Governance</th><th>Security</th><th>Flow</th><th>Freshness</th></tr></thead><tbody>
+@foreach (var repo in Model.Repositories)
+{
+    <tr><td><a class="repo-name" asp-action="Repository" asp-route-id="@repo.Slug">@repo.Name &nearr;</a><small>@repo.Team · Supports @PrototypeData.Projects.Count(p => p.RepositorySlugs.Contains(repo.Slug)) project(s)</small></td>
+    @foreach (var status in new[] { repo.Governance, repo.Security, repo.Flow, repo.Freshness }) { <td><span class="state @PrototypeData.Tone(status)">@status</span></td> }
+    </tr>
+}
+</tbody></table></div><div class="panel-foot">Shared dependencies are included explicitly. Unknown does not mean healthy; stale evidence is never a fresh assessment.</div></section>

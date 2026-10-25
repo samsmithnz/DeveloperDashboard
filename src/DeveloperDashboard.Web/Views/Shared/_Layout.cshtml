@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Developer Dashboard</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <aside class="sidebar" aria-label="Main navigation">
+        <a class="brand" asp-action="Index" asp-controller="Home"><span class="brand-mark">D</span> Developer<br /><span class="brand-sub">Dashboard</span></a>
+        <div class="org"><span class="avatar">A</span><div>Acme engineering<small>Sample organization</small></div></div>
+        <div class="nav-caption">WORKSPACE</div>
+        <nav>
+            <a class="@(ViewContext.RouteData.Values["action"]?.ToString() is "Index" or "Project" or "Repository" ? "active" : "")" asp-controller="Home" asp-action="Index"><span aria-hidden="true">&#9638;</span> Project dashboard</a>
+            <a class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Recommendations" ? "active" : "")" asp-controller="Home" asp-action="Recommendations"><span aria-hidden="true">&#9776;</span> Recommendations <span class="nav-count">3</span></a>
+        </nav>
+        <div class="sidebar-bottom"><span class="status-dot"></span> Read-only GitHub App<small>No repository writes. No rankings.</small></div>
+    </aside>
+    <div class="workspace">
+        <header class="topbar"><span>Engineering workspace <span class="slash">/</span> @ViewData["Title"]</span><span class="viewer">Prototype admin <span class="avatar small-avatar">JD</span></span></header>
+        <div class="demo-banner"><strong>Interactive design prototype</strong> Fictional data only. No GitHub connection, authentication, or live synchronization.</div>
+        <main id="main" tabindex="-1">@RenderBody()</main>
+        <footer>Built for team improvement, not individual measurement. <span>GitHub-only MVP · 90-day history retention</span></footer>
+    </div>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+@model IReadOnlyList<DurationMetric>
+<div class="project-metrics">
+@foreach (var metric in Model)
+{
+    <article class="metric">
+        <h4>@metric.Name</h4>
+        <div class="metric-current"><strong>@metric.Value</strong><span class="metric-health @PrototypeData.Tone(metric.Health)"><span aria-hidden="true" class="metric-dot"></span>@metric.Health</span></div>
+        <div class="metric-trend @metric.TrendTone">
+            <span aria-hidden="true">@(metric.Trend == "Improving" ? "↗" : metric.Trend == "Declining" ? "↘" : "—")</span> @metric.Trend
+            @if (metric.Trend is "Improving" or "Declining")
+            { <span>· @metric.History[0].Scale &rarr; @metric.Current.Scale</span> }
+        </div>
+        @if (metric.IsApplicable)
+        {
+            <ol class="metric-history" aria-label="@metric.Name fictional history, oldest to newest">
+            @foreach (var period in metric.History)
+            {
+                <li><span>@period.Window</span><strong>@(period.Scale?.ToString() ?? "No data")</strong></li>
+            }
+            </ol>
+        }
+        <details class="metric-evidence">
+            <summary>Definition, target &amp; evidence</summary>
+            <p>@metric.Definition Calculation v1. Each band represents a median, not a repository average.</p>
+            <p>Illustrative target: @metric.Target or faster. Health compares the current band with this target; trend compares the first and latest windows, not small changes within a band. Health is not evaluated for missing, stale, or inapplicable observations.</p>
+            <p>Bands: minutes &lt; 1 hour; hours &lt; 1 day; days &lt; 1 week; weeks &lt; 30 days; months 30 days or more.</p>
+            <p>Source: @metric.Source. Fictional 2026 data only, not live measurements or an industry benchmark.</p>
+            @if (!metric.IsApplicable)
+            { <p>Sample configuration reviewed: 18 Oct 2026. No metric collection applies.</p> }
+            else if (metric.Current.Scale is null)
+            { <p>No successful metric collection is available for this sample.</p> }
+            else
+            { <p>Last successful sample collection: @(metric.IsStale ? "11 Oct 2026 (partial latest window)" : "18 Oct 2026").</p> }
+            <ul>@foreach (var period in metric.History) { <li>@period.Window: @period.SampleSize observations</li> }</ul>
+            @if (metric.Limitation is not null) { <p>@metric.Limitation</p> }
+        </details>
+    </article>
+}
+</div>

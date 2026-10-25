@@ -1,0 +1,25 @@
+@model RepositoryCard
+@{ ViewData["Title"] = Model.Name; }
+<a class="back-link" asp-action="Index">&larr; Project dashboard</a>
+<div class="repository-projects"><span class="subtle">Supporting repository for</span>
+@foreach (var project in PrototypeData.Projects.Where(p => p.RepositorySlugs.Contains(Model.Slug)))
+{ <a asp-action="Project" asp-route-id="@project.Slug">@project.Name &rarr;</a> }
+</div>
+<div class="page-heading"><div><div class="eyebrow">@Model.Team.ToUpperInvariant() / REPOSITORY DETAIL</div><h1>@Model.Name</h1><p>@Model.Description · @Model.Criticality criticality</p></div><span class="state @PrototypeData.Tone(Model.Freshness)">@Model.Freshness sample snapshot</span></div>
+<div class="summary-grid detail-summary">
+    @foreach (var item in new[] { ("Governance", Model.Governance), ("Security", Model.Security), ("Flow", Model.Flow) })
+    { <article class="summary"><span>@item.Item1</span><h2 class="mt-3"><span class="state @PrototypeData.Tone(item.Item2)">@item.Item2</span></h2><p>Independent assessment · sample data</p></article> }
+</div>
+@if (Model.Freshness == "Stale") { <div class="notice">Collection is stale. Last known results are shown, not a fresh assessment. A failed collection never becomes healthy.</div> }
+<div class="detail-grid">
+<section class="panel"><div class="panel-heading"><div><h2>Evidence &amp; recommended action</h2><p>Versioned rules with explainable results</p></div></div>
+@foreach (var finding in PrototypeData.Recommendations.Where(r => r.Repository == Model.Slug))
+{
+    <div class="finding"><span class="state @PrototypeData.Tone(finding.Severity)">@finding.Severity</span><span class="rule">@finding.Rule · v1</span><h3>@finding.Title</h3><p>@finding.Explanation</p><details><summary>Suggested fix &amp; evidence</summary><p>@finding.Fix</p><p class="subtle">Fictional evidence — no live GitHub alert is linked. Collected in the sample snapshot.</p></details></div>
+}
+@if (!PrototypeData.Recommendations.Any(r => r.Repository == Model.Slug))
+{ <div class="finding"><h3>No actionable findings in this sample</h3><p>This does not mean every check is healthy. Unknown and insufficient-data states remain separate.</p></div> }
+<div class="panel-foot"><a asp-action="Recommendations">Open improvement queue &rarr;</a></div></section>
+<section class="panel"><div class="panel-heading"><div><h2>Collection context</h2><p>Trust starts with the limitations</p></div></div><dl class="context"><dt>Source</dt><dd>Fictional GitHub App installation</dd><dt>Scope</dt><dd>Opt-in repository inventory</dd><dt>History</dt><dd>90-day retention · hourly and manual snapshots</dd><dt>Visibility</dt><dd>All organization members can view findings</dd><dt>Evidence access</dt><dd>GitHub links require GitHub's own permissions</dd></dl></section>
+</div>
+<section class="panel mt-4"><div class="panel-heading"><div><h2>Engineering flow</h2><p>First human review · selected CI workflows · no developer rankings</p></div></div><div class="finding"><span class="state neutral">Not loaded in prototype</span><p class="mt-3 mb-0">The live view will show elapsed review hours, PR aging, CI success rate and duration, with 30-day windows and sample sizes. We do not invent metric values for this screen.</p></div></section>

@@ -2,10 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/DeveloperDashboard.Web/DeveloperDashboard.Web.csproj" />
   </Folder>
-<<<<<<< HEAD
-=======
   <Folder Name="/tests/">
     <Project Path="tests/DeveloperDashboard.Web.Tests/DeveloperDashboard.Web.Tests.csproj" />
   </Folder>
->>>>>>> origin/main
 </Solution>

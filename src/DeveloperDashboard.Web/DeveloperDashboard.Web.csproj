@@ -4,10 +4,6 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-<<<<<<< HEAD
-  </PropertyGroup>
-
-=======
     <UserSecretsId>developer-dashboard-web-local</UserSecretsId>
   </PropertyGroup>
 
@@ -16,5 +12,4 @@
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
   </ItemGroup>
 
->>>>>>> origin/main
 </Project>

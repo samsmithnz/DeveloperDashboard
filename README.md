@@ -1,12 +1,5 @@
 # Developer Dashboard
 
-## Interactive UI prototype
-
-The `src/DeveloperDashboard.Web` project is a .NET 10 ASP.NET Core MVC design
-prototype with fictional, in-memory sample data. It is not the production MVP:
-there is no authentication, GitHub connection, synchronization, or persistence.
-Run it locally only; do not expose it as an authenticated dashboard.
-
 ## Build, test, and run
 
 Install the .NET 10 SDK. From the repository root:
@@ -33,6 +26,11 @@ configuration is wired for managed-identity access, but snapshot persistence
 is not implemented.
 
 ## Interactive UI prototype
+
+The `src/DeveloperDashboard.Web` project is a .NET 10 ASP.NET Core MVC design
+prototype with fictional, in-memory sample data. It is not the production MVP:
+there is no authentication, GitHub connection, synchronization, or persistence.
+Run it locally only; do not expose it as an authenticated dashboard.
 
 Open `http://localhost:5080`. Project inventory comes first, followed by portfolio
 context and the prioritized improvement queue. Each project shows metric values

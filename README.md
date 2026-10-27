@@ -7,10 +7,40 @@ prototype with fictional, in-memory sample data. It is not the production MVP:
 there is no authentication, GitHub connection, synchronization, or persistence.
 Run it locally only; do not expose it as an authenticated dashboard.
 
+<<<<<<< HEAD
 ```sh
 dotnet run --project src/DeveloperDashboard.Web --urls http://localhost:5080
 ```
 
+=======
+## Build, test, and run
+
+Install the .NET 10 SDK. From the repository root:
+
+```sh
+dotnet restore DeveloperDashboard.slnx
+dotnet build DeveloperDashboard.slnx --configuration Release
+dotnet test DeveloperDashboard.slnx --configuration Release
+dotnet run --project src/DeveloperDashboard.Web --urls http://localhost:5080
+```
+
+Open `http://localhost:5080`; readiness is available at
+`http://localhost:5080/health/ready`. The readiness endpoint checks only that
+the application is running and does not probe external services. Logs are
+written to the console as structured JSON. Development and production logging
+can be overridden with the standard `Logging` configuration section.
+
+Azure Table Storage endpoint and table name are configured under
+`AzureTableStorage:Endpoint` and `AzureTableStorage:TableName`. Local overrides
+can be stored with `dotnet user-secrets`; see [Azure deployment](docs/deployment.md)
+for local identity and deployment instructions. Credentials and keys must not
+be stored in application settings or committed to source control. Storage
+configuration is wired for managed-identity access, but snapshot persistence
+is not implemented.
+
+## Interactive UI prototype
+
+>>>>>>> origin/main
 Open `http://localhost:5080`. Project inventory comes first, followed by portfolio
 context and the prioritized improvement queue. Each project shows metric values
 as time bands, with a separate health indicator and a three-window history.
